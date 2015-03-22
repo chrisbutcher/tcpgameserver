@@ -101,7 +101,7 @@ func main() {
 
       clientUuid := fmt.Sprintf("%s", uuid.NewV4())
       clients[conn] = clientUuid
-      go handleConnection(conn, clients[conn], requests, expiredConnections)
+      go handleConnection(conn, clientUuid, requests, expiredConnections)
 
     case request := <-requests:
       go updateGameState(request, lastGameState, gameStates)
@@ -114,8 +114,9 @@ func main() {
       lastGameState = gameState
 
     case conn := <-expiredConnections:
-      log.Printf("Client %s disconnected", clients[conn])
       delete(clients, conn)
+      clientCount -= 1
+      log.Printf("Client %s disconnected", clients[conn])
     }
   }
 }
